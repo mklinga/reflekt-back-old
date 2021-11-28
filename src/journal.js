@@ -2,23 +2,21 @@ const express = require("express");
 const journal = express();
 
 const loadJournal = date => {
-    return {
-        mood: '😍',
-        title: 'First journal / title',
-        journal: 'This might be the best there ever is or was or will be.',
-        social: [
-            { completed: true, description: 'Social 1' },
-            { completed: true, description: 'Social 2' }
-        ],
-        physical: [
-            { completed: true, description: 'Physical 1' }
-        ]
+    try {
+        const data = require(`./journals/${date}.json`);
+        return data;
+    } catch (e) {
+        console.info('No data found for date', date);
+        return null;
     }
 }
 
 journal.get('/:date', (req, res) => {
-    console.log('journaling', req.params.date);
-    res.send(loadJournal(req.params.date));
+    const journal = loadJournal(req.params.date);
+    if (!journal) {
+        res.status(404);
+    } 
+    res.send(journal);
 })
 
 module.exports = journal;
